@@ -22,44 +22,11 @@ import { MapView, } from 'expo';
 // Main App Class starts here
 export default class App extends React.Component {
   state = {
-    location: null,
-    error_message: null,
-    // TODO Markers are used for test and should be changed afterwards
-    markers: [
-      {
-        coordinate: {
-          latitude: 45.524548,
-          longitude: -122.6749817,
-        },
-        title: "Best Place",
-        description: "This is the best place in Portland",
-      },
-      {
-        coordinate: {
-          latitude: 45.524698,
-          longitude: -122.6655507,
-        },
-        title: "Second Best Place",
-        description: "This is the second best place in Portland",
-      },
-      {
-        coordinate: {
-          latitude: 45.5230786,
-          longitude: -122.6701034,
-        },
-        title: "Third Best Place",
-        description: "This is the third best place in Portland",
-      },
-      {
-        coordinate: {
-          latitude: 45.521016,
-          longitude: -122.6561917,
-        },
-        title: "Fourth Best Place",
-        description: "This is the fourth best place in Portland",
-      },
-    ]
+    mapRegion: { latitude: 37.78825, longitude: -122.4324, latitudeDelta: 0.0922, longitudeDelta: 0.0421 },
+    locationResult: null,
+    location: {coords: { latitude: 37.78825, longitude: -122.4324}},
   };
+  
   componentWillMount() {
     if(Platform.OS = 'android' && !Constants.isDevice) {
       this.setState({
@@ -69,6 +36,10 @@ export default class App extends React.Component {
       this._getLocationAsync();
     }
   }
+
+  _handleMapRegionChange = mapRegion => {
+    this.setState({ mapRegion });
+  };
 
   _getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
@@ -92,20 +63,20 @@ export default class App extends React.Component {
     }
     
     return (
-      <MapView
-      style={styles.map}
-      initialRegion={{
-        latitude: parseFloat(long),
-        longitude: parseFloat(lat),
-        latitudeDelta: 0.0043,
-        longitudeDelta: 0.0032,
-      }
-  }
+      <View style={styles.container}>
+        <MapView
+          style={styles.map}
+          region={{ latitude: this.state.location.coords.latitude, longitude: this.state.location.coords.longitude, latitudeDelta: 0.005, longitudeDelta: 0.005, zoomControl: true }}
+          onRegionChange={this._handleMapRegionChange}
+        >
+    <MapView.Marker
+      coordinate={this.state.location.coords}
+      title="My Marker"
+      description="Some description"
     />
-    <Mapview.Marker coordinate = {marker.}>
-      </Mapview.Marker>
+        </MapView>
       
-    }
+      </View>
     );
   }
 }
